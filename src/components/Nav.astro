@@ -1,0 +1,18 @@
+---
+const { pathname } = Astro.url;
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+
+<header class="nav">
+  <div class="container nav__inner">
+    <a class="nav__brand" href="/">Lulu Zhao <span>· University of Michigan</span></a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="/research" aria-current={isActive('/research') ? 'page' : undefined}>Research Vision</a>
+      <a href="/work"     aria-current={isActive('/work')     ? 'page' : undefined}>Selected Work</a>
+      <a href="/teaching" aria-current={isActive('/teaching') ? 'page' : undefined}>Teaching</a>
+      <a href="/contact"  aria-current={isActive('/contact')  ? 'page' : undefined}>Contact</a>
+      <a class="nav__cta" href="https://clear.engin.umich.edu" target="_blank" rel="noopener">CLEAR Center →</a>
+    </nav>
+  </div>
+</header>
