@@ -1,0 +1,100 @@
+---
+import Base from './Base.astro';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    description?: string;
+    date?: string;
+  };
+}
+
+const { frontmatter } = Astro.props;
+const dateShown = frontmatter.date
+  ? new Date(frontmatter.date + 'T00:00:00').toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+    })
+  : undefined;
+const noteYear = frontmatter.date
+  ? new Date(frontmatter.date + 'T00:00:00').getFullYear()
+  : new Date().getFullYear();
+---
+
+<Base title={frontmatter.title} description={frontmatter.description}>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+    integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+"
+    crossorigin="anonymous"
+  />
+  <article class="container note">
+    {dateShown && <p class="note__date">{dateShown}</p>}
+    <slot />
+    <footer class="note__license">
+      Text and figures &copy; {noteYear} Lulu Zhao &middot;
+      <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener"
+        >CC BY 4.0</a
+      > &mdash; free to reuse with attribution.
+    </footer>
+  </article>
+</Base>
+
+<style is:global>
+  .note {
+    padding: 3rem 0 5rem;
+    max-width: 46rem;
+  }
+  .note__date {
+    font-size: 0.85rem;
+    color: #777;
+    margin-bottom: 0.5rem;
+  }
+  .note h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); margin-bottom: 1.2rem; }
+  .note h2 { font-size: clamp(1.35rem, 2.5vw, 1.7rem); margin: 2.4rem 0 0.8rem; }
+  .note h3 { margin: 1.8rem 0 0.6rem; }
+  .note p, .note li { line-height: 1.65; margin-bottom: 0.9rem; }
+  .note hr { border: none; border-top: 1px solid #ddd; margin: 2.2rem 0; }
+  .note table {
+    border-collapse: collapse;
+    margin: 1.2rem 0;
+    font-size: 0.92rem;
+    display: block;
+    overflow-x: auto;
+  }
+  .note th, .note td {
+    border: 1px solid #ddd;
+    padding: 0.45rem 0.7rem;
+    text-align: left;
+  }
+  .note th { background: #f6f6f4; }
+  .note code {
+    font-size: 0.88em;
+    background: #f4f4f2;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+  .note pre {
+    background: #f6f6f4;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1.2rem 0;
+  }
+  .note pre code { background: none; padding: 0; }
+  .note .katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.2rem 0; }
+  .note blockquote {
+    border-left: 3px solid #ccc;
+    padding-left: 1rem;
+    color: #555;
+    margin: 1.2rem 0;
+  }
+  .note__license {
+    margin-top: 3rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid #e5e5e2;
+    font-size: 0.82rem;
+    color: #777;
+  }
+  .note__license a { color: inherit; }
+</style>

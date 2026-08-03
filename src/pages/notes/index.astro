@@ -1,0 +1,73 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// Self-building index: every .md file in this folder with frontmatter
+// (title, description, date [ISO], topic) is listed automatically.
+const modules = import.meta.glob('./*.md', { eager: true });
+const notes = Object.values(modules)
+  .map((m: any) => ({
+    title: m.frontmatter.title,
+    description: m.frontmatter.description,
+    date: m.frontmatter.date,
+    topic: m.frontmatter.topic,
+    url: m.url,
+  }))
+  .filter((n) => n.title)
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+const fmt = (d: string) =>
+  new Date(d + 'T00:00:00').toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+  });
+---
+
+<Base
+  title="Random Walks — Lulu Zhao"
+  description="Working notes: idea-wanderings on space plasma physics, numerical modeling, and whatever else diffuses through."
+>
+  <section class="container walks">
+    <h1>Random Walks</h1>
+    <p class="walks__intro measure">
+      Working notes without a planned destination — derivations, explanations,
+      and lessons learned along the way. Like their namesake, they cover
+      ground in proportion to &radic;<span class="walks__t">t</span>.
+    </p>
+    <ul class="walks__list">
+      {notes.map((n) => (
+        <li class="walks__item">
+          <div class="walks__meta">
+            <span class="walks__date">{fmt(n.date)}</span>
+            {n.topic && <span class="walks__topic">{n.topic}</span>}
+          </div>
+          <a class="walks__title" href={n.url}>{n.title}</a>
+          {n.description && <p class="walks__desc measure">{n.description}</p>}
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .walks { padding: 3rem 0 5rem; }
+  .walks__intro { color: #555; margin: 0.8rem 0 2.4rem; }
+  .walks__t { font-style: italic; }
+  .walks__list { list-style: none; padding: 0; margin: 0; }
+  .walks__item { padding: 1.4rem 0; border-top: 1px solid #e5e5e2; }
+  .walks__meta { display: flex; gap: 0.8rem; align-items: baseline; margin-bottom: 0.3rem; }
+  .walks__date { font-size: 0.82rem; color: #777; }
+  .walks__topic {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8a6d3b;
+  }
+  .walks__title {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .walks__title:hover { text-decoration: underline; }
+  .walks__desc { color: #555; font-size: 0.95rem; margin-top: 0.35rem; }
+</style>
