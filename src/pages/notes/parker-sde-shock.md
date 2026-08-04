@@ -6,6 +6,7 @@ date: "2026-08-02"
 topic: "SEP physics"
 ---
 # Diffusive Shock Acceleration, the Parker Equation, and Its Limits: Working Notes
+# Diffusive Shock Acceleration, the Parker Equation, and Its Limits: Working Notes
 
 *Notes developed while validating the MITTENS stochastic SEP transport code
 against analytic shock-acceleration solutions and real CME-event field-line
@@ -313,7 +314,102 @@ zero in uniform regions — becomes a large, shock-localized quantity. The
 elegance of exact advection is paid for by concentrating all the numerical
 difficulty of the discontinuity into the diffusion bookkeeping.
 
-### 4.6 Itô vs Stratonovich
+### 4.6 Derivation: the Parker equation in Lagrangian coordinates, and where $dS$ comes from
+
+Section 4.5 stated the flux-tube operator; here is its derivation from the
+Parker equation, assumption by assumption.
+
+**Setup.** Field-aligned diffusion (gyrotropy makes $\kappa$ a parallel
+scalar) and ideal MHD (frozen-in field, so plasma parcels on a line remain
+on it). Along one line, with $x$ the arc length and $A(x,t)$ the
+cross-section of an elementary flux tube, the exact tube form of the
+parallel-diffusion divergence is
+$\nabla\cdot(\hat{\mathbf b}F_\parallel) = \tfrac{1}{A}\partial_x(A F_\parallel)$
+— particle number in a slab is $fA\,dx$, flux through a face is
+$A\kappa\,\partial_x f$, conservation does the rest. Magnetic flux
+conservation, $BA=\mathrm{const}$, eliminates the geometry: $A\propto 1/B$:
+
+$$
+\frac{\partial f}{\partial t} + u\frac{\partial f}{\partial x}
+= B\frac{\partial}{\partial x}\Big(\frac{\kappa}{B}\frac{\partial f}{\partial x}\Big)
++ \frac{p}{3}(\nabla\cdot\mathbf{u})\frac{\partial f}{\partial p}.
+$$
+
+**Lagrangian labels.** Attach the label $s$ to plasma parcels:
+$x = X(s,t)$ with $\partial X/\partial t|_s = u$, and define
+
+$$
+dS(s,t) \equiv \frac{\partial X}{\partial s}
+$$
+
+— **$dS$ is the Jacobian of the label-to-position map**, physical length
+per unit label. Two chain-rule identities follow: for any $g$,
+
+$$
+\frac{\partial g}{\partial t}\Big|_{s}
+= \frac{\partial g}{\partial t}\Big|_{x} + u\,\frac{\partial g}{\partial x},
+\qquad
+\frac{\partial}{\partial x} = \frac{1}{dS}\frac{\partial}{\partial s}.
+$$
+
+The first collapses the entire advective derivative into $\partial_t f|_s$
+— advection absorbed exactly, the founding advantage of the frame. The
+second is applied *once per spatial derivative* in the diffusion operator —
+this is the "divided by $dS$", used twice:
+
+$$
+\frac{\partial f}{\partial t}\Big|_{s}
+= \frac{B}{dS}\frac{\partial}{\partial s}
+\Big(\frac{\kappa}{B\,dS}\frac{\partial f}{\partial s}\Big)
++ \frac{p}{3}(\nabla\cdot\mathbf{u})\frac{\partial f}{\partial p}.
+$$
+
+The inner $1/dS$ converts the gradient; the outer $B/dS$ converts the
+tube divergence $\tfrac1A\partial_x(A\,\cdot)$ with $A \propto 1/B$. Both
+factors are chain rule, not modelling choices.
+
+**Continuity closes the system.** Mass conservation along the parcel,
+$D\rho/Dt = -\rho\nabla\cdot\mathbf u$, reads
+$\nabla\cdot\mathbf{u} = -\,\partial_t \ln\rho\,|_s$, turning the adiabatic
+term into the compression kick. Applied to the mass of one label cell,
+$m = \rho A\,dS \propto \rho\,dS/B = \mathrm{const}$, it also gives
+
+$$
+\frac{\partial}{\partial t}\ln\!\Big(\frac{dS}{B}\Big)\Big|_s
+= -\,\frac{\partial \ln\rho}{\partial t}\Big|_s
+$$
+
+— the metric's evolution is locked to the kick: the same compression that
+accelerates particles shrinks $dS$, which is precisely how a velocity jump
+gets recorded as a diffusivity jump inside the operator.
+
+**From operator to SDE coefficients.** The operator is a weighted
+diffusion, $\partial_t f = \tfrac1w\partial_s(wD\,\partial_s f)$, with
+weight $w = dS/B$ and label diffusivity $D = \kappa/dS^2$. Walkers sample
+number per label, $n = wf$; substituting $f = n/w$ (with $w$ frozen during
+a step — its slow evolution is continuity's business, above):
+
+$$
+\frac{\partial n}{\partial t}
+= \frac{\partial^2}{\partial s^2}\big(Dn\big)
+- \frac{\partial}{\partial s}\Big(n\;\frac{1}{w}\frac{\partial (wD)}{\partial s}\Big),
+$$
+
+which is forward-Kolmogorov form, so by inspection
+
+$$
+b = \frac{\sqrt{2\kappa}}{dS},
+\qquad
+A = \frac{B}{dS}\,\frac{\partial}{\partial s}\Big(\frac{\kappa}{B\,dS}\Big)
+$$
+
+— exactly the noise and drift coefficients a field-line SDE code must (and,
+in MITTENS, does) implement, with $\partial_s$ realized as a one-label
+finite difference. Every $dS$ in the implementation is accounted for by
+this derivation: one Jacobian per spatial derivative, plus the walker
+measure $w = dS/B$.
+
+### 4.7 Itô vs Stratonovich
 
 The same physical equation corresponds to different SDE coefficient sets
 depending on the stochastic calculus: with the **full** drift
