@@ -601,8 +601,8 @@ $$
 
 A quarter less per round leaves you ten times poorer at the end — and "fewer
 particles at every energy, worse the higher you go" *is* a steeper slope.
-The measured effect for a one-cell $r=4$ shock: slope $-4.5$ instead of
-$-4.0$, i.e. the solver behaves like an $r \approx 3.2$ shock.
+The measured effect for a one-cell $r=4$ shock: slope $-4.60 \pm 0.05$
+instead of $-4.0$, i.e. the solver behaves like an $r \approx 2.9$ shock.
 
 ### 8.6 Why "widen the shock" is a repair, not a cheat
 
@@ -639,12 +639,22 @@ sits far from the physical wall except the widest).
 
 ![Fitted spectral slope versus measured shock transition width](/notes/parker-sde-shock/figures/width_scan.png)
 
-*Fitted slope (40–200 keV, $t = 1200$ s) versus measured transition width.
-The discontinuous one-cell jump (red) sits at $-4.48$; every smooth profile
-recovers to $-4.06\ldots-4.27$; the optimum plateau is at 4–6 cells,
-consistent with theory plus the small finite-width correction (green band);
-at 7–8 cells — width approaching $L$ — the slope steepens again (orange):
-the physical suppression of Section 6 switching on, as predicted.*
+*Fitted slope (40–200 keV, $t = 1200$ s) versus measured transition width,
+with four independent random-seed realizations per filled point (error bars
+are standard errors of the mean). The discontinuous one-cell jump (red) sits
+at $-4.60 \pm 0.05$; every smooth profile recovers to a flat plateau at
+$-4.13 \pm 0.02$ from two cells upward — smoothness, not width, is the
+requirement. The green diamond is the same 3-cell case run at one-third the
+timestep: it moves to $-4.04$, indicating that most of the small remaining
+deficit of the smooth cases is ordinary timestep error (the fly-over defect),
+leaving the truly width/smoothness-induced part within the predicted
+finite-width band (green). Open gray circles are single-seed runs; the 7–8
+cell point's mild steepening — width approaching $L$ — is consistent with
+the physical suppression of Section 6 switching on. A single-seed
+compression-ratio generalization ($r = 3$, theory $-4.50$) measured
+$-4.60 \pm 0.09$: the solver reproduces the $r$-dependence of the DSA
+slope (measured $r=4 \to r=3$ shift $0.47 \pm 0.10$ vs the theoretical
+$0.50$).*
 
 ![Shock spectra for all widths with the analytic reference](/notes/parker-sde-shock/figures/width_spectra.png)
 
@@ -654,13 +664,16 @@ progressive in energy — the compound-interest signature made visible — while
 all smooth profiles track the reference until the shared finite-time cutoff
 region.*
 
-Two conclusions with practical force. First, *profile smoothness matters as
-much as width*: a smooth two-cell ramp already removes most of the bias,
-because Defects 1 and 3 are about representability, not size. Second, the
-resolved optimum (4–6 cells) plus the free-lunch condition $W \ll L$
+Three conclusions with practical force. First, *profile smoothness is the
+requirement, not width*: a smooth two-cell ramp already recovers the full
+plateau, because Defects 1 and 3 are about representability, not size.
+Second, the small residual deficit of the smooth cases decomposes cleanly:
+mostly ordinary timestep error (removable by dt refinement — the green
+diamond), with the remainder inside the expected finite-width correction.
+Third, the smooth plateau plus the free-lunch condition $W \ll L$
 reproduces, from measurement, exactly the admission window of Section 7 — and
-condemns any "sharpening" scheme that condenses real smeared shocks to one or
-two cells: it lands the solver on the red point of the figure.
+condemns any "sharpening" scheme that condenses real smeared shocks to a
+one-cell discontinuity: it lands the solver on the red point of the figure.
 
 ---
 
