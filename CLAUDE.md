@@ -60,6 +60,7 @@ existing frontmatter with the master, rewriting figure paths:
 (`head -8` once duplicated the H1 title — the frontmatter block is 7 lines.)
 Copy any new/updated figures into `public/notes/<slug>/figures/` as well.
 
-Current note pairs (master -> page):
-- `Doc/parker_sde_shock_notes.md` -> `notes/parker-sde-shock.md`
+Current note pairs (master -> page), a three-part series:
+- `Doc/parker_to_sde_notes.md` -> `notes/parker-to-sde.md`
+- `Doc/shock_grid_resolution_notes.md` -> `notes/shock-grid-resolution.md`
 - `Doc/timestep_notes.md` -> `notes/sde-timestep.md`

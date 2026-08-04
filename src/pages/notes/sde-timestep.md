@@ -7,8 +7,11 @@ topic: "numerical methods"
 ---
 # How Small Must a Timestep Be? The dt Ledger of a Stochastic Transport Solver
 
-*Companion working notes to* [Diffusive Shock Acceleration, the Parker
-Equation, and Its Limits](/notes/parker-sde-shock) *, developed while
+*Part 3 of a three-part series on stochastic SEP transport — Part 1: [From the Parker Equation to a Stochastic Solver](/notes/parker-to-sde); Part 2: [Shock Width, Diffusion Length, and What a Grid Must Resolve](/notes/shock-grid-resolution).*
+
+*Companion working notes to* [From the Parker Equation to a Stochastic
+Solver](/notes/parker-to-sde) *and* [Shock Width, Diffusion Length, and
+What a Grid Must Resolve](/notes/shock-grid-resolution)*, developed while
 profiling and validating the MITTENS stochastic SEP transport code. They
 collect the complete list of timescales that constrain the timestep of a
 stochastic-differential-equation (SDE) solver of the Parker equation, what a
@@ -129,8 +132,9 @@ The door to adaptivity was always open.
 
 ## 5. Separating timestep error from everything else: measurements
 
-Three experiments on the analytic $r=4$ shock (see the companion note for
-the setup) isolate what $\Delta t$ does and does not cause:
+Three experiments on the analytic $r=4$ shock (see
+[Shock Width, Diffusion Length, and What a Grid Must Resolve](/notes/shock-grid-resolution)
+for the setup) isolate what $\Delta t$ does and does not cause:
 
 1. **A timestep-convergence series** (global cap 0.03 / 0.01 / 0.001 s at
    fixed output time) showed the large spectral bias of an *unresolved*
@@ -211,3 +215,19 @@ $\Delta t \le \alpha\,d^2/2\kappa_{\rm eff}$ is required**, so that the
 step length ramps down smoothly on approach and no particle ever jumps a
 significant fraction of its distance to the front. The ~80× ceiling
 measured here is what that rule stands to reclaim, legitimately.
+
+![Cap-scan summary: fitted slope and spectra versus the global timestep cap](/notes/sde-timestep/figures/param_cap_scan.png)
+
+*The cap scan of the table above. Left: fitted slope versus the cap, with
+the baseline replicate band — the speedup annotations (1×, 14×, 80×) ride
+down the degradation curve. Right: spectra divided by the analytic $p^{-4}$
+reference; the deficit grows with energy, the compound-interest signature.*
+
+![Per-particle timestep versus position from the shock for the three caps](/notes/sde-timestep/figures/dt_profile.png)
+
+*Where the mechanism lives: the timestep each particle actually takes
+versus Lagrangian distance from the shock. The adaptive ledger bites only
+inside the detected shock zone (gray, $W = 3$); in the upstream foot
+(green, $L = 10$) — the region that decides return statistics — the step
+already sits at the full cap, giving upstream jumps of 1.4 and 4.5 cells
+for the raised caps. The approach-region hole, made visible.*
