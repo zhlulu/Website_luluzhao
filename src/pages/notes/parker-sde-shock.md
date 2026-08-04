@@ -6,7 +6,6 @@ date: "2026-08-02"
 topic: "SEP physics"
 ---
 # Diffusive Shock Acceleration, the Parker Equation, and Its Limits: Working Notes
-# Diffusive Shock Acceleration, the Parker Equation, and Its Limits: Working Notes
 
 *Notes developed while validating the MITTENS stochastic SEP transport code
 against analytic shock-acceleration solutions and real CME-event field-line
