@@ -193,11 +193,15 @@ The cheapest option was tested directly: the resolved-shock benchmark run
 with the global cap raised, nothing else changed. Three caps, same physics,
 same analysis:
 
-| cap [s] | wall time | speedup | slope (40–200 keV) | amplitude vs baseline |
+| cap [s] | advance time | speedup | slope (40–200 keV) | amplitude vs baseline |
 |---|---|---|---|---|
-| 0.01 (baseline, 4 seeds) | ≈ 2.5 h | 1× | $-4.13 \pm 0.05$ | 1 |
-| 0.1 | 11 min | ≈ 14× | $-4.35 \pm 0.07$ | 0.88 |
-| 1.0 | 109 s | ≈ 80× | $-4.74 \pm 0.11$ | 0.90 |
+| 0.01 (baseline, 4 seeds) | 5833 s ≈ 1.6 h | 1× | $-4.13 \pm 0.05$ | 1 |
+| 0.1 | 646 s ≈ 11 min | ≈ 9× | $-4.35 \pm 0.07$ | 0.88 |
+| 1.0 | 109 s | ≈ 53× | $-4.74 \pm 0.11$ | 0.90 |
+
+(Times are the summed per-iteration advance-loop cost from the runlogs,
+which excludes I/O; an earlier draft overstated the baseline at 2.5 h and
+hence the speedups at 14×/80×.)
 
 The speedup is as large as promised — and the spectrum degrades
 monotonically with the cap, already ~3σ outside the replicate band at 0.1 s.
@@ -213,13 +217,13 @@ Conclusion, measured rather than argued: **configuration alone cannot buy
 the large speedup — the graduated distance rule
 $\Delta t \le \alpha\,d^2/2\kappa_{\rm eff}$ is required**, so that the
 step length ramps down smoothly on approach and no particle ever jumps a
-significant fraction of its distance to the front. The ~80× ceiling
+significant fraction of its distance to the front. The ~50× ceiling
 measured here is what that rule stands to reclaim, legitimately.
 
 ![Cap-scan summary: fitted slope and spectra versus the global timestep cap](/notes/sde-timestep/figures/param_cap_scan.png)
 
 *The cap scan of the table above. Left: fitted slope versus the cap, with
-the baseline replicate band — the speedup annotations (1×, 14×, 80×) ride
+the baseline replicate band — the speedup annotations (1×, 9×, 53×) ride
 down the degradation curve. Right: spectra divided by the analytic $p^{-4}$
 reference; the deficit grows with energy, the compound-interest signature.*
 
