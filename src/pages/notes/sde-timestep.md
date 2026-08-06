@@ -235,3 +235,80 @@ inside the detected shock zone (gray, $W = 3$); in the upstream foot
 (green, $L = 10$) — the region that decides return statistics — the step
 already sits at the full cap, giving upstream jumps of 1.4 and 4.5 cells
 for the raised caps. The approach-region hole, made visible.*
+
+## 8. Postscript II: the graduated ramp, implemented and measured
+
+The rule Section 6 called for now exists in the code: `#DISTANCETIMESTEP`
+enables a distance ramp
+
+$$
+\Delta t \;\le\; \alpha\,\frac{d^{2}}{2\kappa_{\rm lagr}},
+$$
+
+where $d$ is each particle's Lagrangian distance to the **shock center**
+(floored at one cell, and also limited by the distance to either end of
+the line), together with a shock-motion guard
+$\Delta t \le d/2V_{\rm sh}$ and a compression-rate guard
+$\Delta t \le \alpha/|d\ln\rho/d\tau|$. One knob, $\alpha = 0.1$ by
+default: a step's diffusive displacement never exceeds
+$\sqrt{\alpha} \approx 1/3$ of the gap to the nearest structure. Since
+$\kappa$ enters the denominator, the rule is automatically energy-aware:
+every energy gets its own parabolic funnel.
+
+![Baseline uniform step versus the adaptive ramp at three energies](/notes/sde-timestep/figures/dt_baseline_vs_adaptive.png)
+
+*The uniform baseline charges everyone the worst-case price (black); the
+ramp prices each particle by distance and energy. A 1 MeV particle at the
+kick steps 20× finer than the baseline — that is where the accuracy
+improvement lives; far away it steps at the coupling cadence — that is
+where the speedup lives.*
+
+Two design lessons were paid for on the way:
+
+1. **Anchor at the center, not the detected zone edge.** The first
+   implementation trusted the threshold-walk width of the shock zone and
+   failed exactly like the no-ramp configuration: on smooth shocks the
+   detected zone (compression above threshold) is an order of magnitude
+   wider than the kick structure, so the "protected" region started tens
+   of cells out. The arg-max of the compression is robust for every
+   profile shape; the width is not. Strictness by geometry (a monotone
+   function of distance to a robust anchor) degrades gracefully;
+   strictness by classification (zone membership) fails categorically
+   when the classifier is wrong.
+2. **Verify parameter ingestion, not file contents.** One "failure" of
+   the scheme was a run whose `#DISTANCETIMESTEP` block had been appended
+   after `#END`, where the reader never looks — the run silently executed
+   the known-broken uniform-cap configuration and faithfully reproduced
+   its fingerprint (both the wall time and the slope). Pre-registered
+   expectations caught it within one diagnosis cycle.
+
+Validation, 21 runs across three compression ratios (all slopes are
+momentum-space, $t = 1200$ s, 40–200 keV fit):
+
+| configuration | slope | expectation | advance time |
+|---|---|---|---|
+| $r=4$, adaptive $\alpha=0.1$ (3 seeds) | $-4.036 \pm 0.007$ | dt/3-converged $-4.03$ | 957 s (6.1×) |
+| $r=4$, adaptive $\alpha=0.3$ | $-4.122 \pm 0.022$ | baseline $-4.126$ | 334 s (17×) |
+| $r=4$, adaptive, cap 0.1 s | $-3.996 \pm 0.021$ | unchanged vs cap 1.0 | 1443 s |
+| $r=3$, adaptive (7 seeds) | $-4.695 \pm 0.025$ | uniform-converged $-4.75 \pm 0.05$ | 608 s (11.8×) |
+| $r=2$, adaptive (8 seeds) | $-6.140 \pm 0.057$ | theory $-6.0$ − finite-$W$ residual | ~360 s |
+
+The safety factor has a clean dose–response ($\alpha$: 0.1 = converged,
+0.3 = baseline-grade at 17×), and the cap probe settles the design
+question of Section 6 in the strongest way: with the ramp active, varying
+the global cap by 10× changes nothing — the bound ledger is complete, and
+the cap reverts to what it should be, a structural backstop at the
+coupling cadence. Nothing that changes the answer lives in a hand-set
+constant.
+
+One measured subtlety deserves the last word. The adaptive runs book
+$\sim$7% less occupation weight below 30 keV than the $\Delta t = 10^{-2}$ s
+baseline. Every probe says this offset is *convergence, not loss*: it
+tracks the near-shock resolution knob in lockstep with the slope
+correction, is untouched by the far-field cap, and the refined uniform
+run sits partway between. The under-resolved baseline leaves too many
+particles lingering unaccelerated at injection energies; resolving the
+kick promotes them out of the band. The lesson mirrors the note's theme:
+when a cheaper and a dearer calculation disagree, the disagreement itself
+is not evidence of which one is wrong — dose–response along the
+resolution axis is.

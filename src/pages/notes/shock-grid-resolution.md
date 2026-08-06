@@ -541,3 +541,63 @@ The single most useful sentence to retain: **the diffusion length
 $L = \kappa/U_1$ is how far a random stagger can beat a steady conveyor —
 and therefore the size of everything a diffusing particle can know about,
 build, or respond to around a shock.**
+
+## 9. Postscript: the weak-shock residual — a finite-width penalty that resolution cannot buy back
+
+A validation campaign across compression ratios (21 runs, converged
+timesteps, ~3-cell smooth tanh shocks, momentum-space slopes at
+$t = 1200$ s) measured how far the *converged* spectrum falls below ideal
+DSA as the shock weakens:
+
+| $r$ | theory $q$ | measured (seeds) | residual |
+|---|---|---|---|
+| 4 | $-4.0$ | $-4.036 \pm 0.007$ (3) | $-0.036$ |
+| 3 | $-4.5$ | $-4.695 \pm 0.025$ (7) | $-0.195$ |
+| 2 | $-6.0$ | $-6.140 \pm 0.057$ (8) | $-0.140$ |
+
+Weak shocks pay a real penalty of $\approx -0.15$ to $-0.2$ in slope that
+the $r=4$ benchmark barely hints at. Two natural explanations were tested
+and **both failed**:
+
+1. **A constant effective-$r$ deficit** (the same $\delta r$ from profile
+   smearing, amplified by $dq/dr = 3/(r-1)^2$) predicts $-0.08$ at $r=3$
+   and $-0.32$ at $r=2$ — wrong by a factor $\gtrsim 2$ in *both*
+   directions.
+2. **Grid resolution of the flank.** A Lagrangian equal-mass grid
+   self-refines through a shock by exactly the factor $r$ (downstream
+   cells are $1/r$ the upstream size), so at fixed physical width a weak
+   shock is sampled by proportionally fewer downstream-flank cells
+   (1.5 at $r=2$ vs 3.0 at $r=4$) — a seductive mechanism, since weak
+   shocks then get the least refinement *and* carry the steepest
+   $dq/dr$. The deconfounding experiment — $r=3$ regenerated with the
+   tanh width scaled so its downstream flank matches $r=4$'s sampling —
+   left the residual **unchanged** ($-0.238 \pm 0.032$ vs
+   $-0.195 \pm 0.025$).
+
+![Slope residual versus compression ratio, with the deconfound point](/notes/shock-grid-resolution/figures/residual_vs_r.png)
+
+*The residual is intrinsic to representing a weak shock as a resolved
+smooth profile: matching the flank sampling (orange) does not remove it.
+Dots are individual seeds.*
+
+What survives is informative: widening the profile 1.33× deepened the
+residual by $1.22 \pm 0.21\times$ — the linear-in-$W$ signature of a
+genuine finite-width correction (the $W/L$ penalty of Section 4 acting
+inside its nominally "safe" regime), with a coefficient $C(r)$ that grows
+much faster toward weak shocks than the $dq/dr$ sensitivity alone.
+Characterizing $C(r)$ is open work.
+
+Practical consequences:
+
+- **Sharpen to the narrowest smooth profile** (~3 cells). Widening always
+  costs slope; "wider for weak shocks" is wrong.
+- **For weak shocks ($r \lesssim 3$) no resolved-width representation is
+  unbiased** at these $W/L$. Production CME shocks beyond tens of solar
+  radii are predominantly weak — this is the regime that matters — so the
+  durable fix is the analytic sub-grid interface of Section 8's
+  checklist, not better gridding.
+- **Error model**: the seed-to-seed scatter of a fitted slope grows
+  steeply with spectral steepness — $\sigma = 0.012,\ 0.065,\ 0.162$ at
+  $q = 4,\ 4.5,\ 6$. Single-seed slope measurements of steep spectra are
+  $\pm 0.16$ quantities, and fit-only error bars understate the truth by
+  up to an order of magnitude.
