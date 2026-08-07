@@ -601,3 +601,79 @@ Practical consequences:
   $q = 4,\ 4.5,\ 6$. Single-seed slope measurements of steep spectra are
   $\pm 0.16$ quantities, and fit-only error bars understate the truth by
   up to an order of magnitude.
+
+## 10. Postscript II: repairing the sharpener — an amount/rate confusion and its repair
+
+The production code's answer to over-wide delivered shocks is
+`sharpen_shock`: sum the compression rate over the detected zone and
+redeposit it on a narrow stencil at the front. Auditing it against this
+note's criteria uncovered two independent defects, one of them a
+longstanding quantitative bug.
+
+**The amplitude bug.** The zone-summed `dLogRho` is already a *rate* —
+for a front translating at $V$ cells per coupling interval the sum
+telescopes to $V\ln r$ per interval, and a cell swept by the moving
+stencil accumulates $\mathrm{Sum}/V = \ln r$ exactly, independent of
+stencil width and shock speed. Conservation therefore requires
+depositing the sum *unchanged*. The historical code multiplied it by
+$0.5\,\Delta i_{\rm sh}$ — a crossing-time conversion appropriate for an
+*amount*, applied to a quantity that is already a rate — so each cell's
+lifetime kick integrated to $(\Delta i_{\rm sh}/2)\ln r$: **half the
+log-compression** at the common one-cell-per-coupling cadence
+($r_{\rm eff}=\sqrt{r}$), and a spurious kinematic modulation
+($r_{\rm eff}=r^{\Delta i_{\rm sh}/2}$) whenever the crossing rate
+varied. Measured on a smeared $r=4$ shock (adaptive stepping, three
+seeds per point): slope $-4.83$ at $f=0.5$ versus $-3.93$ at $f=1$,
+with the $t=1200$ s cutoff rising from $\sim$6 to $\sim$100 MeV — and a
+third dose–response point at $f=1/3$ ($-6.08$) confirming the axis.
+This resolves the code's oldest known pathology ("acceleration far too
+weak; had to scale dLogRho by hand"): the hand scaling compensated a
+factor-two normalization bug.
+
+**Shape is second-order, with a sign that flips with amplitude.** The
+full stencil-shape $\times$ amplitude matrix (three seeds per cell,
+same data) shows the historical 2-cell $[2/3,1/3]$ spike and a 3-cell
+binomial $[1/4,1/2,1/4]$ differ by only $\sim$0.1–0.2 — but smoothing
+*hurts* at half amplitude and *helps* at full amplitude, where the
+spike overshoots theory hard ($-3.84$) and the binomial lands closer
+($-3.93$). The overshoot mechanism: a particle's momentum gain is a
+path integral of the kick rate, and accelerating particles linger near
+the front; concentrating the same budget raises the rate exactly where
+the lingerers are, so the *particle* ledger over-collects even while
+the *cell* ledger balances. The spikier the stencil, the larger the
+over-collection.
+
+![Sharpening repair summary: dose-response, shape matrix, weak-shock verdict](/notes/shock-grid-resolution/figures/sharpen_fix.png)
+
+*Left: slope versus deposit amplitude for both stencil shapes on the
+smeared $r=4$ shock — amplitude is first-order, shape second-order.
+Right: the production-regime test.*
+
+![Kick-profile comparison: smooth tanh, historical spike, binomial](/notes/shock-grid-resolution/figures/stencil_profiles.png)
+
+*What the stencils actually deposit. The historical 2-cell spike (red)
+carries hard edges and, at $\Delta i_{\rm sh}=1$, half the area; the
+binomial (green) is the smoothest full-area shape three cells can
+express.*
+
+**The production-regime verdict.** On smeared *weak* shocks — the
+configuration real events actually present — the fixed sharpener
+(binomial, $f=1$) lands the spectrum on DSA theory: $-4.486\pm0.018$
+versus theory $-4.5$ at $r=3$ (its unsharpened reference sits at
+$-4.809$), and $-5.95\pm0.13$ versus theory $-6.0$ at $r=2$ (where
+seed scatter $\sigma\approx0.3$ at $q\approx6$ with 400 particles
+limits resolution — a measured warning against trusting few-seed slope
+fits of steep spectra). Notably the sharpened $r=3$ result is *better*
+than the resolved narrow-shock benchmark ($-4.71$): the concentration
+overshoot (hard) and the intrinsic weak-shock width residual (soft)
+appear to cancel, and since both ride the same $dq/dr$ amplification
+the cancellation may be systematic. Compensation is not correctness:
+the kick is still sharpened on *unsharpened* fields (metric, $\kappa$,
+$B$ keep the smeared profile), a hybrid that solves no single Parker
+problem. For fit-band particles ($L \gg W_{\rm data}$) the
+inconsistency is a measured $\mathcal{O}(W/L)$ correction; for the
+population sharpening exists to serve ($W_{\rm kick} < L < W_{\rm
+data}$) it is $\mathcal{O}(1)$ and untested — the honest probe
+(reduce $\kappa$ until part of the spectrum sits in that band) and the
+consistent endpoint (an analytic sub-grid interface obeying all jump
+conditions at once) are both open work.
