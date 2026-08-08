@@ -14,5 +14,8 @@
     "astro": "^5.0.0",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0"
+  },
+  "devDependencies": {
+    "staticrypt": "^3.5.4"
   }
 }

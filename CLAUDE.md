@@ -65,3 +65,15 @@ Current note pairs (master -> page), a three-part series plus companions:
 - `Doc/shock_grid_resolution_notes.md` -> `notes/shock-grid-resolution.md`
 - `Doc/timestep_notes.md` -> `notes/sde-timestep.md`
 - `Doc/rng_notes.md` -> `notes/rng-for-sde.md`
+
+## Password protection of the notes section
+
+The Random Walks pages (notes index + all note pages) are encrypted at
+deploy time by `scripts/protect-notes.mjs` (StatiCrypt, AES-256): figures
+are inlined as data URIs first so they are protected too, then each page
+is encrypted in place. The password comes from the STATICRYPT_PASSWORD
+GitHub Actions secret (rotate with `gh secret set STATICRYPT_PASSWORD`);
+`.staticrypt.json` holds the (non-secret) salt and must stay committed so
+"remember me" survives redeploys. Local `npm run build` produces an
+UNPROTECTED dist/ unless you export STATICRYPT_PASSWORD and run the
+script - never deploy a locally-built dist by hand.
