@@ -136,3 +136,48 @@ $8.57\sigma$ — beyond the reach of any plausible budget; and the
 statistics of the *method* (seed scatter $\sigma\!\sim\!0.3$ on steep
 spectra at 400 particles) remain the price of Monte Carlo, payable in
 compute and replicate discipline regardless of generator.
+
+## 6. Where the defect provably appears — and where it provably hides
+
+"If the spectra are indistinguishable, why should a developer care?" The
+answer is that observability is a property of the *observable*, not of
+the defect — and one can derive in advance which observables a given
+defect must corrupt, then measure exactly those. We did, for both of the
+LCG's structural defects:
+
+- **The kick ceiling, measured as an event census.** The true Gaussian
+  process mandates a rate for kicks beyond the LCG's wall at
+  $6.5527\sigma$. Counting over $3.1\times10^{11}$ Box–Muller pairs per
+  generator: xoshiro256+ produced 13 such kicks (Poisson-consistent with
+  the expected $\sim$17); the LCG produced **zero** — probability
+  $\sim e^{-13}$ if it were sampling the true process. A physically
+  mandated event class is deleted outright, invisibly to any
+  ensemble-averaged observable.
+- **The period, exhibited as replayed turbulence.** In a single-rank run
+  of the production benchmark with an instrumented generator, draws
+  $n$ and $n + 536{,}870{,}912$ were bit-identical for all 2000 logged
+  positions: midway through the run, the scattering history of the
+  simulation began repeating *verbatim*. Particles late in the run
+  diffuse through an exact rerun of the early turbulence — a statement
+  about the physics of the run, demonstrated from inside it.
+
+![Twelve spectra, two generators](/notes/rng-for-sde/figures/rng_spectra_6v6.png)
+
+*And where it hides: six spectra per generator, identical physics. No
+eye and no $\pm0.006$ fit can sort these by generator — the same code,
+the same week, in which both defects above were demonstrated exactly.*
+
+Together with Section 4 this completes the argument in its honest form.
+The defect provably hides in ensemble-averaged spectra at current
+precision, because round-robin dealing dilutes recycled subsequences
+across $10^4$ particles; it provably appears in extreme-value censuses
+and epoch correlations, because no dilution can manufacture events the
+generator cannot emit, or decorrelate a stream that repeats verbatim.
+Which class of observable tomorrow's science will need is unknowable —
+event-to-event variability, single-detector time profiles, and
+higher-precision ensembles all lean toward the sensitive class. That is
+why the generator must be sound *by construction*: an error you could
+see, you could also catch; this one can only be prevented. The
+corruption being invisible in today's headline observable is not a
+reason to keep the generator — it is the precise reason it had to be
+replaced.
