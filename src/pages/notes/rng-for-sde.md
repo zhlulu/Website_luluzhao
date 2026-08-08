@@ -161,6 +161,13 @@ LCG's structural defects:
   diffuse through an exact rerun of the early turbulence — a statement
   about the physics of the run, demonstrated from inside it.
 
+![The two positive demonstrations](/notes/rng-for-sde/figures/rng_routes12.png)
+
+*The defects surfacing where theory says they must: the extreme-kick
+census (left) and the in-solver trace one generator period apart
+(right) — red circles landing exactly on the blue curve, 2000 of 2000
+pairs bit-identical.*
+
 ![Twelve spectra, two generators](/notes/rng-for-sde/figures/rng_spectra_6v6.png)
 
 *And where it hides: six spectra per generator, identical physics. No
